@@ -1,0 +1,19 @@
+# Ignore macOS system files
+.DS_Store
+
+# Ignore build and binary files
+bin/
+*.o
+*.out
+*.exe
+main
+run_tests
+
+# Ignore editor and IDE files
+.vscode/
+.idea/
+*.swp
+
+# Ignore other common files
+*.log
+*.tmp

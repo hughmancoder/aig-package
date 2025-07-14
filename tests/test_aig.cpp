@@ -5,7 +5,19 @@
 #include <iostream>
 #include <sstream>
 
-int main() { // Minimal AAG 2 inputs, 1 output, and 1 AND gate
+int main() {
+
+  // Test utility function to enumerate inputs
+  {
+    Aig aig;
+    auto inputs = aig.enumerate_inputs(2);
+
+    // std::cout << "Test enumerated Inputs" << std::endl;
+    // A B | Y
+    std::vector<std::vector<bool>> expected = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+    assert(inputs == expected);
+  }
+
   {
     std::istringstream in("aag 3 2 0 1 1\n"
                           "2\n"
@@ -14,6 +26,7 @@ int main() { // Minimal AAG 2 inputs, 1 output, and 1 AND gate
                           "6 2 4\n");
     Aig aig;
     aig.parse(in);
+    std::cout << "\nTest .aag format parsing:\n";
     assert(aig.get_inputs().size() == 2);
     assert(aig.get_outputs().size() == 1);
     // nodes_ holds inputs + outputs + AND gates => 2 + 1 + 1 = 4
@@ -27,8 +40,7 @@ int main() { // Minimal AAG 2 inputs, 1 output, and 1 AND gate
     aig.parse(f);
     assert(aig.get_inputs().size() == 2);
     assert(aig.get_outputs().size() == 1);
-
-    // assert(aig.is_topologically_sorted());
+    assert(aig.is_topologically_sorted());
 
     size_t and_count = 0;
     for (auto const &n : aig.get_nodes())
@@ -37,17 +49,17 @@ int main() { // Minimal AAG 2 inputs, 1 output, and 1 AND gate
     assert(and_count == 1);
 
     auto tt = aig.generate_truth_table();
-    aig.display_truth_table(tt);
-    // NOTE For debugging purposes
-    std::cout << "Truth Table for AND gate:\n";
-    
+    aig.display_truth_table(tt, 2);
 
-    // std::vector<std::vector<bool>> expected = {// Format A B Y
-    //                                            {0, 0, 0},
-    //                                            {0, 1, 0},
-    //                                            {1, 0, 0},
-    //                                            {1, 1, 1}};    
-    // assert(tt == expected); // TODO
+    std::cout << "\nTruth Table for AND gate aig:\n";
+    std::cout << "A B | Y \n";
+    aig.display_truth_table(tt, 2);
+        std::vector<std::vector<bool>> expected = {// Format A B Y
+                                               {0, 0, 0},
+                                               {0, 1, 0},
+                                               {1, 0, 0},
+                                               {1, 1, 1}};
+    assert(tt == expected);
   }
 
   // full_adder.aag
@@ -58,9 +70,8 @@ int main() { // Minimal AAG 2 inputs, 1 output, and 1 AND gate
     aig.parse(in);
     assert(aig.get_inputs().size() == 3);
     assert(aig.get_outputs().size() == 2);
+    assert(aig.is_topologically_sorted());
 
-    // assert(fa.is_topologically_sorted());
-    
     size_t and_count = 0;
     for (auto const &n : aig.get_nodes())
       if (n.type == Aig::Type::AND)
@@ -68,11 +79,21 @@ int main() { // Minimal AAG 2 inputs, 1 output, and 1 AND gate
     assert(and_count == 11);
 
     auto tt = aig.generate_truth_table();
-    std::cout << "Truth Table for full_adder aig:\n";
-    std::cout << "Inputs: A B Cin | Outputs: Cout Sum \n";
-    aig.display_truth_table(tt);
+    std::cout << "\nTruth Table for Full Adder aig:\n";
+    std::cout << "A B Cin | Cout Sum \n";
+    aig.display_truth_table(tt, 3);
 
-    // TODO: assert truth table
+    std::vector<std::vector<bool>> expected = {// A B Cin | Cout Sum
+                                               {0, 0, 0, 0, 0},
+                                               {0, 0, 1, 0, 1},
+                                               {0, 1, 0, 0, 1},
+                                               {0, 1, 1, 1, 0},
+                                               {1, 0, 0, 0, 1},
+                                               {1, 0, 1, 1, 0},
+                                               {1, 1, 0, 1, 0},
+                                               {1, 1, 1, 1, 1}};
+    assert(tt == expected);
+
     
   }
 

@@ -21,14 +21,11 @@ make clean   # deletes ./aig and ./run_tests
 - [x] AIG Node class
 - [x] AIG.hpp (node)
 - [x] Parsing AAG (ASCII)
-  - [x] Verify counts & topological order
-  
-  - Tests
-  - [ ] Resolve TODOS
-  - [ ] Binary parser (read_aiger_binary)- [ ] Test and.aig (check inputs, ouputs, fan-ins of gates)
-
-- [ ] Binary AIG Support
-- [ ] Graph export/print and pretty printing.
+- [x] Verify counts & topological order
+- [x] Resolve TODOS
+- [x] Test and.aig (check inputs, ouputs, fan-ins of gates)
+- [ ] Binary AIG Support (read_aiger_binary)
+- [ ] Graph export/print and pretty printing
 
 ### Goals + Extensions
 
