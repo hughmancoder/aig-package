@@ -2,20 +2,42 @@
 #include <fstream>
 #include "aig.hpp"
 
-int main(int argc, char* argv[]) {
-  
+#include <iostream>
+#include <fstream>
+#include "aig.hpp"
 
-    std::cout << "AIG Example and.aag\n";
+int main() {
+    {
+        const std::string filename = "examples/and.aag";
+        std::cout << "And: " << filename << "\n";
 
-    std::ifstream f("examples/and.aag");
-    Aig aig;
-    aig.parse(f);
+        std::ifstream f(filename);
 
-    auto tt = aig.generate_truth_table();
-    aig.display_truth_table(tt, aig.get_inputs().size());
+
+        Aig aig;
+        aig.parse(f);
+
+        auto tt = aig.generate_truth_table();
+        aig.display_truth_table(tt, aig.get_inputs().size());
+    }
+
+    
+    {
+        const std::string filename = "examples/full_adder.aag";
+        std::cout << "Full Adder: " << filename << "\n";
+
+        std::ifstream f(filename);
+
+        Aig aig;
+        aig.parse(f);
+
+        auto tt = aig.generate_truth_table();
+        aig.display_truth_table(tt, aig.get_inputs().size());
+    }
 
     return 0;
 }
+
 
 /*     aig::Aig aig;
 std::ifstream file("and.aag");
