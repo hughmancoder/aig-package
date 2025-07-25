@@ -5,6 +5,12 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude -O2
 # Default build target
 all: aig
 
+## Helper macro
+
+ifndef FILE
+	FILE := examples/and2.aag   # default
+endif
+
 # Build the main program (aig)
 aig: src/main.cpp src/aig.cpp
 	$(CXX) $(CXXFLAGS) -o ./aig src/main.cpp src/aig.cpp
@@ -13,9 +19,14 @@ aig: src/main.cpp src/aig.cpp
 main:
 	./aig
 
+truth_table: aig
+	@./aig truth_table $(FILE)
+
+show_stats: aig
+	@./aig stats $(FILE)
+
 .PHONY: test
 test: run_tests
-	@echo "Running unit tests..."
 	@./run_tests
 
 # builds test binary

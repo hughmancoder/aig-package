@@ -6,7 +6,6 @@ An AIG (And Inverter Graph) is a directed acyclic graph used to represent Boolea
  
 Combining these nodes allows us to represent more complex logic as Nand gates can be combined in different ways to create any Boolean function.
 
-
 ## AIG Node format (ASCII AIGER)
 
 An AIG node is represented by a literal, which is an integer that can be either even or odd. It encodes both the node number and whether the node is inverted or not
@@ -22,6 +21,25 @@ Inversion bit = L % 2
 Example:
 Literal 6: Node 3, normal
 Literal 7: Node 3, inverted
+
+### Canonical Literal
+
+A canonical literal is the even version of a literal, which is used to represent the node ID without the inversion bit. This allows us to group nodes that are logically equivalent. It can be thought of as a group id for the node.
+
+L & ~1u (removes the inversion bit)
+
+```plaintext
+lit=2  binary=010  => canonical=2  bin=010
+lit=3  binary=011  => canonical=2  bin=010
+
+lit=4  binary=100  => canonical=4  bin=100
+lit=5  binary=101  => canonical=4  bin=100
+```
+
+### Constant Literrals
+
+Literal 0 → constant FALSE
+Literal 1 → constant TRUE
 
 
 ## Mapping literals to node Ids
@@ -44,7 +62,7 @@ This is human readable and can be used to create AIGER files. it has .aag extens
 
 ## And example
 
-```and.aag
+```and2.aag
 aag 3 2 0 1 1
 2 = A (input 1)
 4 = B (input 2)
@@ -54,7 +72,7 @@ aag 3 2 0 1 1
 
 The first line is the header which follows MILOA format.
 
-```
+```text
 M=3: highest variable index is 3
 
 I=2: two primary inputs
@@ -92,7 +110,6 @@ Encoding enuerated
 | 5      | ¬B                | `5`     |
 | 6      | A·B               | `6`     |
 | 7      | ¬(A·B)            | `7`     |
-
 
 ### Full adder example
 
@@ -175,3 +192,6 @@ i = 3 (binary 11):
 
 ![Evaluate AIG and example](../Images/evaluate_aig_and_example.png)
 
+## BLIF (Berkeley Logic Interchange Format)
+
+<https://course.ece.cmu.edu/~ee760/760docs/blif.pdf>

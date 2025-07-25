@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 void Aig::parse(std::istream &in) { parse_aag_and_construct(in); }
 
@@ -78,7 +79,7 @@ bool Aig::is_topologically_sorted() {
   // 1) keep track of the position of each node id in a map
   for (size_t i = 0; i < nodes_.size(); i++) {
     const auto node_id = get_node_id(nodes_[i].literal);
-    literal_to_position[node_id] = i; 
+    literal_to_position[node_id] = i;
   }
 
   // 2) verify order of AND gates to that every fanIn before it has lower id
@@ -105,96 +106,98 @@ bool Aig::is_topologically_sorted() {
   return true;
 }
 
-std::vector<std::vector<bool>>
-Aig::enumerate_inputs(size_t numInputs) const
-{
+std::vector<std::vector<bool>> Aig::enumerate_inputs(size_t numInputs) const {
 
-    // numberRows = 2^numInputs (each input can be 0 or 1). This is the same as shifting 1 left by n bits as each left shift corresponds to multiplying by 2
-    const size_t numRows = 1u << numInputs;
+  // numberRows = 2^numInputs (each input can be 0 or 1). This is the same as
+  // shifting 1 left by n bits as each left shift corresponds to multiplying by
+  // 2
+  const size_t numRows = 1u << numInputs;
 
-    std::vector<std::vector<bool>> truthTable;
-    truthTable.reserve(numRows);
+  std::vector<std::vector<bool>> truthTable;
+  truthTable.reserve(numRows);
 
-    for (size_t i = 0; i < numRows; ++i) {
-        std::vector<bool> row;
-        row.reserve(numInputs);
+  for (size_t i = 0; i < numRows; ++i) {
+    std::vector<bool> row;
+    row.reserve(numInputs);
 
-        for (int bit = numInputs - 1; bit >= 0; bit--) {
-            row.push_back((i >> bit) & 1u); // extract bit from MSB to LSB and push it to the row. Shifting it extracts the bit at position 'bit'
-        }
-
-        truthTable.push_back(std::move(row));
+    for (int bit = numInputs - 1; bit >= 0; bit--) {
+      row.push_back((i >> bit) &
+                    1u); // extract bit from MSB to LSB and push it to the row.
+                         // Shifting it extracts the bit at position 'bit'
     }
-    return truthTable;
+
+    truthTable.push_back(std::move(row));
+  }
+  return truthTable;
 }
 
-std::vector<bool>
-Aig::evaluate_aig(const std::vector<bool>& inputBits) const
-{
+std::vector<bool> Aig::evaluate_aig(const std::vector<bool> &inputBits) const {
 
   // keep track of what each node evaluates to for given input bits
-  std::unordered_map<int,bool> node_id_value;
-    node_id_value.reserve(nodes_.size());
-    
-    // Initialize inputs of AIG with inputBits
-    for (size_t i = 0; i < inputBits.size(); ++i) {
-      node_id_value[get_node_id(inputs_[i])] = inputBits[i];
-    }
+  std::unordered_map<int, bool> node_id_value;
+  node_id_value.reserve(nodes_.size());
 
-      // evaluate the AND gate by taking the values of its inputs (bottom up evaluation)
-      auto evaluate_aig_node = [&](Lit lit) -> bool {
-        if (lit == 0) return false; // 0 literal is always false
-        if (lit == 1) return true;  // 1 literal is always true
-        bool node_value = node_id_value[get_node_id(lit)]; // get
-        return is_inverted(lit) ? !node_value : node_value; 
-      };
+  // Initialize inputs of AIG with inputBits
+  for (size_t i = 0; i < inputBits.size(); ++i) {
+    node_id_value[get_node_id(inputs_[i])] = inputBits[i];
+  }
 
+  // evaluate the AND gate by taking the values of its inputs (bottom up
+  // evaluation)
+  auto evaluate_aig_node = [&](Lit lit) -> bool {
+    if (lit == 0)
+      return false; // 0 literal is always false
+    if (lit == 1)
+      return true; // 1 literal is always true
+    bool node_value = node_id_value[get_node_id(lit)]; // get
+    return is_inverted(lit) ? !node_value : node_value;
+  };
 
-    // Sweep through all the AND nodes in AIG
-     for (const auto& n : nodes_) {
-        if (n.type != Type::AND) continue;
-    
-        // compute child nodes and update parent
-        bool lhs = evaluate_aig_node(n.fanin0);
-        bool rhs = evaluate_aig_node(n.fanin1);
-        node_id_value[get_node_id(n.literal)] = lhs && rhs; // Evaluate AIG node value by taking and of fanin0 and fanin1 and assigning it to the node id
-     }
+  // Sweep through all the AND nodes in AIG
+  for (const auto &n : nodes_) {
+    if (n.type != Type::AND)
+      continue;
 
-     // Evaluate outputs
-      std::vector<bool> outputs;
-      outputs.reserve(outputs_.size());
+    // compute child nodes and update parent
+    bool lhs = evaluate_aig_node(n.fanin0);
+    bool rhs = evaluate_aig_node(n.fanin1);
+    node_id_value[get_node_id(n.literal)] =
+        lhs && rhs; // Evaluate AIG node value by taking and of fanin0 and
+                    // fanin1 and assigning it to the node id
+  }
 
-      // run through all outputs and evaluate them
-     for (Lit output : outputs_) {
-         outputs.push_back(evaluate_aig_node(output));
-    }
-    return outputs;
+  // Evaluate outputs
+  std::vector<bool> outputs;
+  outputs.reserve(outputs_.size());
 
+  // run through all outputs and evaluate them
+  for (Lit output : outputs_) {
+    outputs.push_back(evaluate_aig_node(output));
+  }
+  return outputs;
 }
 
-std::vector<std::vector<bool>>
-Aig::generate_truth_table() const
-{
-    auto input_boolean = enumerate_inputs(inputs_.size());
+std::vector<std::vector<bool>> Aig::generate_truth_table() const {
+  auto input_boolean = enumerate_inputs(inputs_.size());
 
-    std::vector<std::vector<bool>> table;
-    table.reserve(input_boolean.size());
+  std::vector<std::vector<bool>> table;
+  table.reserve(input_boolean.size());
 
-    for (const auto& inBits : input_boolean) {
-        std::vector<bool> row = inBits; 
-        auto outs  = evaluate_aig(inBits);       // add outputs
+  for (const auto &inBits : input_boolean) {
+    std::vector<bool> row = inBits;
+    auto outs = evaluate_aig(inBits); // add outputs
 
-        // append generated outputs to the row sutch that truth table row is format inputs, outputs for each row
-        row.insert(row.end(), outs.begin(), outs.end());
-        // move ensures row should be moved instead of copied by reference
-        table.push_back(std::move(row)); 
-    }
-    return table;
+    // append generated outputs to the row sutch that truth table row is format
+    // inputs, outputs for each row
+    row.insert(row.end(), outs.begin(), outs.end());
+    // move ensures row should be moved instead of copied by reference
+    table.push_back(std::move(row));
+  }
+  return table;
 }
 
-
-
-void Aig::display_truth_table(const std::vector<std::vector<bool>> &tt, size_t numInputs) const {
+void Aig::display_truth_table(const std::vector<std::vector<bool>> &tt,
+                              size_t numInputs) const {
   // If numInputs is not provided (0), use inputs_.size()
   if (numInputs == 0) {
     numInputs = inputs_.size();
@@ -203,7 +206,7 @@ void Aig::display_truth_table(const std::vector<std::vector<bool>> &tt, size_t n
   for (const auto &row : tt) {
     for (size_t i = 0; i < row.size(); ++i) {
       std::cout << row[i];
-      // Draw seperator | after after last input and index numInputs - 1 
+      // Draw seperator | after after last input and index numInputs - 1
       if (i == numInputs - 1) {
         std::cout << " | ";
       } else if (i + 1 < row.size()) {
@@ -213,3 +216,68 @@ void Aig::display_truth_table(const std::vector<std::vector<bool>> &tt, size_t n
     std::cout << "\n";
   }
 }
+
+std::size_t Aig::depth_of(Lit lit,
+                          std::unordered_map<Lit, std::size_t> &memo) const {
+
+  // constant literals are zero‑depth (true/false)
+  if (lit <= 1)
+    return 0;
+
+  Lit group_id = get_canonical_lit(lit); 
+  
+  // check if group_id depth is already computed and return it if so
+  auto it = memo.find(group_id);
+  if (it != memo.end())
+    return it->second;
+
+  // otherwise compute the depth of the node
+  const auto &node = id_node_map_.at(group_id);
+
+  // recursively compute the depth of left and right children nodes
+  int left_depth = depth_of(node.fanin0, memo);
+  int right_depth = depth_of(node.fanin1, memo);
+
+  // the depth of the node depends on the max depth of its children plus one to
+  // include the node itself. Store in memo so we don't have to recompute if we
+  // come across it again
+  return memo[group_id] = 1 + std::max(left_depth, right_depth);
+}
+
+int Aig::compute_depth() const {
+  std::unordered_map<Lit, std::size_t> memo;
+  memo.reserve(nodes_.size());
+
+  size_t maxDepth = 0;
+
+  // for every output literal, compute its depth and memoize it so we don't have
+  // to recompute parent depth for other child nodes
+  for (Lit out : outputs_) {
+    maxDepth = std::max(maxDepth, depth_of(out, memo));
+  }
+  return maxDepth;
+}
+
+std::unordered_map<Lit, std::size_t> Aig::compute_fanout_counts() const {
+  return {}; // Placeholder for fanout counts
+}
+
+void Aig::print_stats() const { 
+   std::size_t andCnt = 0;
+
+   for (const auto &n : nodes_) {
+     if (n.type == Type::AND) {
+       andCnt++;
+     }
+   }
+
+   // TODO
+  // std::size_t maxFO = 0; 
+  
+  std::cout << "Inputs       : " << inputs_.size()  << '\n'
+            << "Outputs      : " << outputs_.size() << '\n'
+            << "AND gates    : " << andCnt          << '\n'
+            << "Depth        : " << compute_depth() << '\n';
+            // << "Max fan‑out  : " << maxFO           << '\n';
+  
+  return; }

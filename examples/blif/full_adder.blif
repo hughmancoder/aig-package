@@ -1,0 +1,28 @@
+.model full_adder
+.inputs A B Cin
+.outputs Sum Cout
+
+# X1 = A XOR B
+.names A B X1
+01 1
+10 1
+
+# A1 = A & B
+.names A B A1
+11 1
+
+# Sum = X1 XOR Cin
+.names X1 Cin Sum
+01 1
+10 1
+
+# A2 = X1 & Cin
+.names X1 Cin A2
+11 1
+
+# Cout = A1 OR A2
+.names A1 A2 Cout
+1- 1
+-1 1
+
+.end

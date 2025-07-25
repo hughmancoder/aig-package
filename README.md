@@ -4,23 +4,46 @@ Author: Hugh Signoriello
 
 ## AIG (And-Inverter Graph)
 
-Library for representing AIGs (And-Inverter Graphs)
+A simple And-Inverter Graph library in C++ for representing and manipulating Boolxean functions
 
 ## Features
 
-## Documentaation
+- Parses AIGER files (ASCII and binary) .aag format
+- Validates if constructed AIG is valid (is_topologically_sorted)
+- Generate Truth Table from constructed aig node
+- Show AIG node stats (Inputs, Outputs, And Gates, Depth, max Fan Out)
+
 
 [Notes](/documentation/NOTES.md)
 
-## Setup 
+## Prerequisites
 
-Ensure the system has c++ compiler installed
+- A C++17 compiler (GCC or Clang)
+- Make (or CMake, if you add support later)
 
 ## Usage
 
 ```shell
+# construct aig from aag file show stats
+make show_stats FILE=<path/to/file.aag> 
+
+# construct aig from aag generate truth table
+make truth_table FILE=<path/to/file.aag>
+
 make         # builds ./aig
-make main    # runs ./aig
 make test    # builds and runs ./run_tests
 make clean   # deletes ./aig and ./run_tests
+```
+
+## Example
+
+```bash
+make show_stats FILE=examples/and2.aag\
+make truth_table FILE=examples/and2.aag
+
+make show_stats FILE=examples/half_adder.aag
+make truth_table FILE=examples/half_adder.aag
+
+make show_stats FILE=examples/full_adder.aag
+make truth_table FILE=examples/full_adder.aag
 ```
