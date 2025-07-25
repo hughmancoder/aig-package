@@ -3,8 +3,6 @@
 #include <iostream>
 #include <string>
 
-
-
 void Aig::parse(std::istream &in) { parse_aag_and_construct(in); }
 
 void Aig::parse_aag_and_construct(std::istream &in) {
