@@ -4,7 +4,7 @@ Author: Hugh Signoriello
 
 ## AIG (And-Inverter Graph)
 
-A simple And-Inverter Graph library in C++ for representing and manipulating Boolxean functions
+A simple And-Inverter Graph library in C++ for representing and manipulating Boolean functions
 
 ## Features
 
@@ -13,8 +13,7 @@ A simple And-Inverter Graph library in C++ for representing and manipulating Boo
 - Generate Truth Table from constructed aig node
 - Show AIG node stats (Inputs, Outputs, And Gates, Depth, max Fan Out)
 
-
-[Notes](/documentation/NOTES.md)
+[Library Notes](/documentation/NOTES.md)
 
 ## Prerequisites
 

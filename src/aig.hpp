@@ -12,8 +12,10 @@ class Aig {
 public:
   enum class Type { INPUT, AND, OUTPUT };
 
-  int get_node_id(Lit lit) const { return lit >> 1; } // extract node id from literal by bit shift (ignoring phase bit). Same as `lit // 2`
+  // Gives numeric index of the node. It extract node id from literal by bit shift (ignoring phase bit). Same as `lit // 2`
+  int get_node_id(Lit lit) const { return lit >> 1; } 
   bool is_inverted(Lit lit) const { return lit & 1u; } // if LSB = 1 then the literal is odd so it is inverted
+  // Gets the even literal that the map of node is keyed on
   int get_canonical_lit(Lit lit) const {
     return lit & ~1u;
   }

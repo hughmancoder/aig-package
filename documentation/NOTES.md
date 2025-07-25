@@ -2,17 +2,37 @@
 
 ## And inverter graph
 
-An AIG (And Inverter Graph) is a directed acyclic graph used to represent Boolean functions and consists of nodes that represent logical operations. Each node consists of two inputs and one output, where the inputs can be either inverted or non-inverted.
- 
-Combining these nodes allows us to represent more complex logic as Nand gates can be combined in different ways to create any Boolean function.
+An And-Inverter Graph (AIG) is a directed acyclic graph that represents Boolean functions using only AND nodes and optional inversion on edges. Each node has two inputs and one output and inputs may be inverted. By composing these nodes, any Boolean function can be built
 
-## AIG Node format (ASCII AIGER)
+## AIGER ASCII Format (.aag)
 
 An AIG node is represented by a literal, which is an integer that can be either even or odd. It encodes both the node number and whether the node is inverted or not
 
+```text
+aag M I L O A
+< I input literals >
+< L latch lines >
+< O output literals >
+< A AND-gate lines: one per gate >
+```
+
+- M: highest variable index (max node id)
+
+- I: number of primary inputs
+
+- L: number of latches (usually 0)
+
+- O: number of primary outputs
+
+- A: number of AND gates
+
+## Literals
+
+A literal is a 32-bit integer encoding both node index and inversion
+
 - Literal = node number * 2 + inversion bit = ID
-- Even Literals: positive non inverted node
-- Odd Literals: inverted node (Inversion bit = 1)
+- Even Literals: positive non inverted node (inversion bit = 0)
+- Odd Literals: inverted node (inversion_bit = 1)
 
 Suppose L is a literal, then:
 Node number = L // 2 (same as L >> 1)
@@ -24,9 +44,11 @@ Literal 7: Node 3, inverted
 
 ### Canonical Literal
 
-A canonical literal is the even version of a literal, which is used to represent the node ID without the inversion bit. This allows us to group nodes that are logically equivalent. It can be thought of as a group id for the node.
+- A canonical literal is the even version of a literal, which is used to represent the node ID without the inversion bit.
+- This allows us to group nodes that are logically equivalent. It can be thought of as a group id for the node.
+- We use when  we look up or store groups in a map e.g: unordered_map<Lit,AigNode>
 
-L & ~1u (removes the inversion bit)
+`L & ~1u (removes the inversion bit)`
 
 ```plaintext
 lit=2  binary=010  => canonical=2  bin=010
@@ -36,7 +58,7 @@ lit=4  binary=100  => canonical=4  bin=100
 lit=5  binary=101  => canonical=4  bin=100
 ```
 
-### Constant Literrals
+### Constant Literals
 
 Literal 0 → constant FALSE
 Literal 1 → constant TRUE
@@ -44,15 +66,16 @@ Literal 1 → constant TRUE
 
 ## Mapping literals to node Ids
 
+we use this to get contiguous node numbering so we can work with vectors. This gives the numeric index of the node
+
 Example: 
 | id (literal) | Binary | `id = L >> 1` |
 | ------------ | ------ | ---------- |
 | 4            | `100`  | `010` (2)  |
 | 5            | `101`  | `010` (2)  |
+| 7            | `111`  | `110` (3)  |
 
 This allows us to group up literals that belong to the same node ID
-
-
 
 <https://fmv.jku.at/aiger/FORMAT.aiger>
 
@@ -191,7 +214,3 @@ i = 3 (binary 11):
   ### evaluate_aig example
 
 ![Evaluate AIG and example](../Images/evaluate_aig_and_example.png)
-
-## BLIF (Berkeley Logic Interchange Format)
-
-<https://course.ece.cmu.edu/~ee760/760docs/blif.pdf>
