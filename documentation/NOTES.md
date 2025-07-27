@@ -42,9 +42,9 @@ Example:
 Literal 6: Node 3, normal
 Literal 7: Node 3, inverted
 
-### Canonical Literal
+### Canonical Literal 
 
-- A canonical literal is the even version of a literal, which is used to represent the node ID without the inversion bit.
+- A canonical literal is the even version of a literal, which is used to represent the without the inversion bit.
 - This allows us to group nodes that are logically equivalent. It can be thought of as a group id for the node.
 - We use when  we look up or store groups in a map e.g: unordered_map<Lit,AigNode>
 
@@ -58,22 +58,20 @@ lit=4  binary=100  => canonical=4  bin=100
 lit=5  binary=101  => canonical=4  bin=100
 ```
 
+### Canonical literal vs node id (number)
+
+The canonical literal gives us logically equivalent nodes for the given aag format.  
+
 ### Constant Literals
 
 Literal 0 → constant FALSE
 Literal 1 → constant TRUE
 
-
 ## Mapping literals to node Ids
 
 we use this to get contiguous node numbering so we can work with vectors. This gives the numeric index of the node
 
-Example: 
-| id (literal) | Binary | `id = L >> 1` |
-| ------------ | ------ | ---------- |
-| 4            | `100`  | `010` (2)  |
-| 5            | `101`  | `010` (2)  |
-| 7            | `111`  | `110` (3)  |
+\
 
 This allows us to group up literals that belong to the same node ID
 
@@ -121,18 +119,6 @@ This encodes the AND gate operation, where 6 is the node id, and 2 and 4 are the
 
 The order of this encoding is node output, input1, input2. Hence Y = A & B,
 
-Encoding enuerated
-
-| Node # | Meaning           | Literal |
-| ------ | ----------------- | ------- |
-| 0      | false const       | `0`     |
-| 1      | true  const (=¬0) | `1`     |
-| 2      | A                 | `2`     |
-| 3      | ¬A                | `3`     |
-| 4      | B                 | `4`     |
-| 5      | ¬B                | `5`     |
-| 6      | A·B               | `6`     |
-| 7      | ¬(A·B)            | `7`     |
 
 ### Full adder example
 
@@ -214,3 +200,19 @@ i = 3 (binary 11):
   ### evaluate_aig example
 
 ![Evaluate AIG and example](../Images/evaluate_aig_and_example.png)
+
+## Show stats
+
+- This shows the number of inputs, outputs, and and gates (the type of node is stored in the aig node object)
+- We also show the depth of the aig by computing a dfs upwards from outputs to inputs and updating the length of the max path found
+- We compute the fanouts counts by incrementing each of the two fanins of the node and ignore the constants. We also increment each outputs driving literal. We find the max fanout by iterating over the fanout hash map linking the canonical (even) literal and taking the max value
+
+## Fanout and Fanins
+
+Fanin of a node: the number of inputs driving that node
+Fanout of a node: the number of gate input pins that the node drives
+
+A high fanout implies one driver is feeding many loads which can translate to larger capacative loads and slower switching on chips
+
+
+For example the full adder has a maximum fanout of 4. Node 2 (x1) has 4 inputs pins driving it

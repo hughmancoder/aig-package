@@ -34,10 +34,10 @@ make test    # builds and runs ./run_tests
 make clean   # deletes ./aig and ./run_tests
 ```
 
-## Example
+## Examples
 
 ```bash
-make show_stats FILE=examples/and2.aag\
+make show_stats FILE=examples/and2.aag
 make truth_table FILE=examples/and2.aag
 
 make show_stats FILE=examples/half_adder.aag
@@ -45,4 +45,7 @@ make truth_table FILE=examples/half_adder.aag
 
 make show_stats FILE=examples/full_adder.aag
 make truth_table FILE=examples/full_adder.aag
+
+make show_stats FILE=examples/invert.aag
+make truth_table FILE=examples/invert.aag
 ```

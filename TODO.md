@@ -9,11 +9,12 @@
 - [x] Resolve TODOS
 - [x] Test and.aig (check inputs, ouputs, fan-ins of gates)  
 - [x] show depth 
-- [ ] show fan-out analysis
+- [ ] show fan-out analysis (Test and push)
 
 
 ### Goals + Extensions
 
+- [ ] AIG construction from truth table
 - [ ] Structural hashing (replace naive push_back with a unique-table)
 - [ ] Very basic optimization (remove duplicate nodes)
 - [ ] Graph export/print and pretty printing (Hard)
@@ -21,3 +22,4 @@
 - [ ] Import / Parse bliff
 - [ ] Export / Save to bliff
 - [ ] Binary AIG Support (read_aiger_binary)
+

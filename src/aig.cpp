@@ -259,8 +259,32 @@ int Aig::compute_depth() const {
 }
 
 std::unordered_map<Lit, std::size_t> Aig::compute_fanout_counts() const {
-  return {}; // Placeholder for fanout counts
+  std::unordered_map<Lit, std::size_t> node_to_fanout_count_map;
+  node_to_fanout_count_map.reserve(nodes_.size());
+
+  // lambda function 
+  auto increment_parent = [&](Lit lit) {
+    // disregard constant literals
+    if (lit == 0 || lit == 1) return; 
+    int parent_id = get_canonical_lit(lit);
+    node_to_fanout_count_map[parent_id]++;
+  };
+
+  // loop through all the inner nodes and increment 
+  for (const auto &n : nodes_) {
+    if (n.type == Type::AND) { 
+      increment_parent(n.fanin0); 
+      increment_parent(n.fanin1);
+    }
+  }
+  for (Lit out : outputs_) {
+    increment_parent(out);
+  }
+
+  return node_to_fanout_count_map;
 }
+
+
 
 void Aig::print_stats() const { 
    std::size_t andCnt = 0;
@@ -271,13 +295,13 @@ void Aig::print_stats() const {
      }
    }
 
-   // TODO
-  // std::size_t maxFO = 0; 
-  
+  auto node_to_fanout_count_map = compute_fanout_counts();
+  std::size_t maxFO = get_max_fanout(node_to_fanout_count_map);
+
   std::cout << "Inputs       : " << inputs_.size()  << '\n'
             << "Outputs      : " << outputs_.size() << '\n'
             << "AND gates    : " << andCnt          << '\n'
-            << "Depth        : " << compute_depth() << '\n';
-            // << "Max fan‑out  : " << maxFO           << '\n';
+            << "Depth        : " << compute_depth() << '\n'
+            << "Max fan‑out  : " << maxFO           << '\n';
   
   return; }

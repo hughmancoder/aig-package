@@ -12,13 +12,15 @@ class Aig {
 public:
   enum class Type { INPUT, AND, OUTPUT };
 
-  // Gives numeric index of the node. It extract node id from literal by bit shift (ignoring phase bit). Same as `lit // 2`
-  int get_node_id(Lit lit) const { return lit >> 1; } 
-  bool is_inverted(Lit lit) const { return lit & 1u; } // if LSB = 1 then the literal is odd so it is inverted
+  // Gives numeric index of the node. It extract node id from literal by bit
+  // shift (ignoring phase bit). Same as `lit // 2`
+  int get_node_id(Lit lit) const { return lit >> 1; }
+  bool is_inverted(Lit lit) const {
+    return lit & 1u;
+  } // if LSB = 1 then the literal is odd so it is inverted
   // Gets the even literal that the map of node is keyed on
-  int get_canonical_lit(Lit lit) const {
-    return lit & ~1u;
-  }
+  // e.g 6 and 7 belong to the same group (node id = 3)
+  int get_canonical_lit(Lit lit) const { return lit & ~1u; }
 
   struct AigNode {
     Type type;
@@ -39,11 +41,20 @@ public:
   const std::vector<Lit> &get_outputs() const { return outputs_; }
   const std::vector<AigNode> &get_nodes() const { return nodes_; }
 
+  std::size_t get_max_fanout(const std::unordered_map<Lit, std::size_t>
+                                 &node_to_fanout_count_map) const {
+    std::size_t maxFO = 0;
+    for (const auto &node : node_to_fanout_count_map) {
+      maxFO = std::max(maxFO, node.second);
+    }
+    return maxFO;
+  }
+
   // Compute depth of AIG
   int compute_depth() const;
   // recursive helper
   std::size_t depth_of(Lit lit,
-                    std::unordered_map<Lit,std::size_t> &memo) const;
+                       std::unordered_map<Lit, std::size_t> &memo) const;
 
   // Gets number of fanouts for each node
   std::unordered_map<Lit, std::size_t> compute_fanout_counts() const;
@@ -72,17 +83,18 @@ public:
   // == helper methods ==
 
   /*
-  Generates a boolean vector truth table for all possible input combinations in ascending order
+  Generates a boolean vector truth table for all possible input combinations in
+  ascending order
   */
   std::vector<std::vector<bool>> enumerate_inputs(size_t numInputs) const;
 
-/*
-  for a given input vector, evaluates the AIG and returns the output vector
-  */
+  /*
+    for a given input vector, evaluates the AIG and returns the output vector
+    */
   std::vector<bool> evaluate_aig(const std::vector<bool> &inputBits) const;
 
   /*
-  */
+   */
 
 private:
   void parse_aag_and_construct(std::istream &in);
