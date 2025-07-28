@@ -76,5 +76,25 @@ A high fanout implies one driver is feeding many loads which can translate to la
 
 ### Full Adder example
 
-- In our full adder AIG the net for literal 2 (x2) feeds four downstream inputs (including the y2 output) so max fan‑out = 4.
+- In the full adder AIG the net for literal 2 (x2) feeds four downstream inputs (including the y2 output) so max fan‑out = 4.
 - Also every AND node in an AIG is strictly 2 input, so the max fan‑in would be 2 for
+
+### Aig Evaluation
+
+`evaluate_aig`
+
+Given I inputs and O outputs we can get the boolean outputs of the aig by applying an I-input binary vector to get an O-output binary vector which reflects the result of the aig.
+
+### Idea
+
+- Populate the and_node_boolean_map with all primary‑input literals mapped to their input bits
+
+- Iterate through each AND gate (topologically sorted)
+
+- Retrieve its two fan‑in literal values (handling constants/inversion)
+
+- Compute their AND and store the result keyed by the gate’s literal index
+
+- Once all AND gates are processed, evaluate each output literal (again handling constants/inversion) by looking it up in the map.
+
+- Collect those Boolean results in order to form the final output vector

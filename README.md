@@ -14,6 +14,8 @@ A simple And-Inverter Graph library in C++ for representing and manipulating Boo
 - Show AIG node stats (Inputs, Outputs, And Gates, Depth, max Fan Out)
 - Write to AIG to AIGER .aag file
 
+## Documentation
+
 [Library Notes](/documentation/NOTES.md)
 
 [ASCII AIG Format representation](/documentation/ASCII_AIGER_FORMAT.md)

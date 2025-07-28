@@ -12,8 +12,6 @@
 - [x] show fan-out analysis
 - [x] Output AAG (write) from AigNodes
 
-
-
 ## Extensions
 
 - [ ] Sweep (remove dead/duplicate nodes)

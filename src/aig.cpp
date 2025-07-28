@@ -301,12 +301,12 @@ void Aig::display_truth_table(const std::vector<std::vector<bool>> &tt,
 std::vector<bool> Aig::evaluate_aig(const std::vector<bool> &inputBits) const {
 
   // keep track of what each node evaluates to for given input bits
-  std::unordered_map<int, bool> node_id_value;
-  node_id_value.reserve(nodes_.size());
+  std::unordered_map<int, bool> and_node_boolean_map;
+  and_node_boolean_map.reserve(nodes_.size());
 
   // Initialize inputs of AIG with inputBits
   for (size_t i = 0; i < inputBits.size(); ++i) {
-    node_id_value[get_variable_index(inputs_[i])] = inputBits[i];
+    and_node_boolean_map[get_variable_index(inputs_[i])] = inputBits[i];
   }
 
   // evaluate the AND gate by taking the values of its inputs (bottom up evaluation)
@@ -315,8 +315,10 @@ std::vector<bool> Aig::evaluate_aig(const std::vector<bool> &inputBits) const {
       return false; // 0 literal is always false
     if (lit == 1)
       return true; // 1 literal is always true
-    bool node_value = node_id_value[get_variable_index(lit)]; // get
-    return is_inverted(lit) ? !node_value : node_value;
+
+    // 
+    bool node_logic_value = and_node_boolean_map[get_variable_index(lit)];
+    return is_inverted(lit) ? !node_logic_value : node_logic_value;
   };
 
   // Sweep through all the AND nodes in AIG
@@ -327,20 +329,21 @@ std::vector<bool> Aig::evaluate_aig(const std::vector<bool> &inputBits) const {
     // compute child nodes and update parent
     bool lhs = evaluate_aig_node(n.fanin0);
     bool rhs = evaluate_aig_node(n.fanin1);
-    node_id_value[get_variable_index(n.literal)] =
-        lhs && rhs; // Evaluate AIG node value by taking and of fanin0 and
-                    // fanin1 and assigning it to the node id
+
+    bool fanout = lhs && rhs; 
+    and_node_boolean_map[get_variable_index(n.literal)] = fanout;
   }
 
   // Evaluate outputs
-  std::vector<bool> outputs;
-  outputs.reserve(outputs_.size());
+  std::vector<bool> output_boolean_values;
+  output_boolean_values.reserve(outputs_.size());
 
-  // run through all outputs and evaluate them
+  // run through all outputs and evaluate them (the ouput nodes are already computed because there is overlap with the top level of and nodes where the literals are both stored as AND type nodes as well as OUTPUT type nodes). 
+  // Therefore on this pass we map the associated AND node logic values to the corresponding output literals where the order of outputs form the O-bit output logic vector
   for (Lit output : outputs_) {
-    outputs.push_back(evaluate_aig_node(output));
+    output_boolean_values.push_back(evaluate_aig_node(output));
   }
-  return outputs;
+  return output_boolean_values;
 }
 
 /*
