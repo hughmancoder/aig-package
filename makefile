@@ -30,6 +30,11 @@ truth_table: aig
 show_stats: aig
 	@./aig stats $(FILE)
 
+sweep: aig
+	@mkdir -p build
+	@./aig sweep $(FILE) $(OUT)
+	@echo "Swept network -> $(OUT)"
+
 .PHONY: test
 test: run_tests
 	@./run_tests

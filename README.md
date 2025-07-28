@@ -37,6 +37,8 @@ make truth_table FILE=<path/to/file.aag>
 # Write aig to .aag 
 make write_to_aag FILE=<path/to/input_file.aag> OUT=<path/to/output_file.aag>
 
+# Sweep aig to reduce algebraic redundancies and save output
+make sweep FILE=<path/to/input_file.aag> OUT=<path/to/output_file.aag>
 
 make         # builds ./aig
 make test    # builds and runs ./run_tests
@@ -49,6 +51,7 @@ make clean   # deletes ./aig and ./run_tests
 make show_stats FILE=examples/full_adder.aag
 make truth_table FILE=examples/full_adder.aag
 make write_to_aag FILE=examples/full_adder.aag OUT=examples/outputs/full_adder_output.
+make sweep FILE=examples/and2_redundant.aag OUT=examples/outputs/and2_redundant_sweeped.aag
 
 make show_stats FILE=examples/and2.aag
 make truth_table FILE=examples/and2.aag

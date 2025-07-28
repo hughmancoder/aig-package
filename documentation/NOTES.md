@@ -72,9 +72,39 @@ The number of inputs driving that node
 
 The number of gate input pins that the node drives
 
-A high fanout implies one driver is feeding many loads which can translate to larger capacative loads and slower switching on chips
+A high fan-out implies one driver is feeding many loads which can translate to larger capacative loads and slower switching on chips
 
 ### Full Adder example
 
 - In our full adder AIG the net for literal 2 (x2) feeds four downstream inputs (including the y2 output) so max fan‑out = 4.
 - Also every AND node in an AIG is strictly 2 input, so the max fan‑in would be 2 for
+
+## Sweeping
+
+We can reduce algebraic redundancies in AIGs. For example:
+
+```plaintext
+0 * b = 0
+1 * b = b
+a * ~a = 0
+a * a = a
+```
+
+### Sweeping example
+
+`and2_redundant.aag`
+
+Structurally this aig can be reduced to be equivalent to and2.aig. 
+A reduction is demonstrated below. We have redundancies as not all nodes are connected to the output and are useless as they do not meaningfully affect the output. Below nodes 8 and 10 and the corresponding edges would be considered redundant.
+
+```and2_redundant.aag
+aag 5 2 0 1 3
+2
+4
+8
+6 2 4
+8 2 4
+10 2 2
+```
+
+![and2_redundant](../Images/and2_redundant_sweeped.png)

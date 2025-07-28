@@ -12,11 +12,9 @@
 - [x] show fan-out analysis
 - [x] Output AAG (write) from AigNodes
 
-
-
 ## Extensions
 
-- [ ] Sweep (remove dead/duplicate nodes)
+- [x] Sweep (remove dead/duplicate nodes)
 - [ ] Structural hashing (replace naive push_back with a unique-table)
 - [ ] Very basic optimization (remove duplicate nodes)
 - [ ] Graph export/print and pretty printing 

@@ -80,3 +80,4 @@ full_adder example (carry, sum)
 We can see that the aig respresented above is functionally equivalent to the boolean logic. Each aig node is enumerated with the corresponding literals and node logic values in the example below
 
 ![Full Adder AAG Explained](../Images/full_adder_aag_explained.png)
+
