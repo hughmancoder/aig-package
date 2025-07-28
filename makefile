@@ -19,6 +19,11 @@ aig: src/main.cpp src/aig.cpp
 main:
 	./aig
 
+write_to_aag: aig
+	@mkdir -p build
+	@./aig write $(FILE) $(OUT)
+	@echo "Wrote $(OUT)"
+
 truth_table: aig
 	@./aig truth_table $(FILE)
 

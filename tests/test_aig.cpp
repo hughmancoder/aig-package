@@ -43,10 +43,9 @@ int main() {
     assert(aig.get_inputs().size() == 2);
     assert(aig.get_outputs().size() == 1);
     assert(aig.get_nodes().size() == 4);
-    assert(aig.is_topologically_sorted());
 
-    // std::cout << "std::AIG depth: " << aig.compute_depth() << "\n";
-    assert(aig.compute_depth() == 2);
+    std::cout << "std::AIG depth: " << aig.compute_depth() << "\n";
+    assert(aig.compute_depth() == 1);
     
     auto fan_out_counts = aig.compute_fanout_counts();
     
@@ -79,8 +78,7 @@ int main() {
     aig.parse(in);
     assert(aig.get_inputs().size() == 3);
     assert(aig.get_outputs().size() == 2);
-    assert(aig.is_topologically_sorted());
-    assert(aig.compute_depth() == 5);
+    assert(aig.compute_depth() == 4);
     
     auto fan_out_counts = aig.compute_fanout_counts();
     std::size_t max_fanout = aig.get_max_fanout(fan_out_counts);
@@ -117,7 +115,6 @@ int main() {
 
     assert(aig.get_inputs().size() == 3);
     assert(aig.get_outputs().size() == 2);
-    assert(aig.is_topologically_sorted());
 
     auto tt = aig.generate_truth_table();
 

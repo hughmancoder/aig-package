@@ -22,7 +22,16 @@ int main(int argc, char *argv[]) {
     auto tt = aig.generate_truth_table();
     std::cout << "Truth table (" << tt.size() << " rows):\n";
     aig.display_truth_table(tt, aig.get_inputs().size());
-  } else {
+  } 
+  else if (cmd == "write") {
+    if (argc < 4) { std::cerr << "Missing <out.aag>\n"; return 1; }
+    std::ofstream out(argv[3]);
+    if (!out) { std::cerr << "Failed to open for write: " << argv[3] << "\n"; return 1; }
+    aig.write_aag(out);
+    return 0;
+  }
+  
+  else {
     std::cerr << "Unknown command '" << cmd << "'\n";
     return 1;
   }
