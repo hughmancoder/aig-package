@@ -43,9 +43,8 @@ public:
   int compute_depth() const;
 
   // Gets number of fan-outs for each node (keyed by canonical literal)
-  std::unordered_map<Lit, std::size_t> compute_fanout_counts() const;
-
-  std::size_t get_max_fanout(const std::unordered_map<Lit, std::size_t>& fanout) const;
+  // std::unordered_map<Lit, std::size_t> compute_fanout_counts() const;
+  // std::size_t get_max_fanout(const std::unordered_map<Lit, std::size_t>& fanout) const;
 
   void print_stats() const;
 

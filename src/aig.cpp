@@ -179,40 +179,6 @@ int Aig::compute_depth() const {
   return static_cast<int>(maxDepth);
 }
 
-std::unordered_map<Lit, std::size_t> Aig::compute_fanout_counts() const {
-  std::unordered_map<Lit, std::size_t> node_to_fanout_count_map;
-  node_to_fanout_count_map.reserve(nodes_.size());
-
-  // lambda function 
-  auto increment_parent = [&](Lit lit) {
-    // disregard constant literals
-    if (lit == 0 || lit == 1) return; 
-    node_to_fanout_count_map[get_canonical_lit(lit)]++;
-  };
-
-  // loop through all the inner nodes and increment 
-  for (const auto &n : nodes_) {
-    // stored in order from top to bottom
-    if (n.type == Type::AND) { 
-      increment_parent(n.fanin0); 
-      increment_parent(n.fanin1);
-    }
-  }
-  for (Lit out : outputs_) {
-    increment_parent(out);
-  }
-
-  return node_to_fanout_count_map;
-}
-
-std::size_t Aig::get_max_fanout(const std::unordered_map<Lit, std::size_t>& m) const {
-  std::size_t maxFanOut = 0;
-  for (const auto &it : m) {
-    maxFanOut = std::max(maxFanOut, it.second);
-  }
-  return maxFanOut;
-}
-
 void Aig::print_stats() const { 
    std::size_t andCnt = 0;
 
@@ -222,14 +188,14 @@ void Aig::print_stats() const {
      }
    }
 
-  auto node_to_fanout_count_map = compute_fanout_counts();
-  std::size_t maxFO = get_max_fanout(node_to_fanout_count_map);
+  
+  // auto node_to_fanout_count_map = compute_fanout_counts();
+  // std::size_t maxFO = get_max_fanout(node_to_fanout_count_map);
 
   std::cout << "Inputs       : " << inputs_.size()  << '\n'
             << "Outputs      : " << outputs_.size() << '\n'
             << "AND gates    : " << andCnt          << '\n'
-            << "Depth        : " << compute_depth() << '\n'
-            << "Max fan‑out  : " << maxFO           << '\n';
+            << "Depth        : " << compute_depth() << '\n';
   
   return; }
 
@@ -346,37 +312,37 @@ std::vector<bool> Aig::evaluate_aig(const std::vector<bool> &inputBits) const {
   return output_boolean_values;
 }
 
-/*
-// aag format does not require this
-bool Aig::is_topologically_sorted() {
-std::unordered_map<Lit, size_t> literal_to_position;
-// 1) keep track of the position of each node id in a map
-for (size_t i = 0; i < nodes_.size(); i++) {
-  const auto variable_index = get_variable_index(nodes_[i].literal);
-  literal_to_position[variable_index] = i;
-}
+// TODO: fix bug and test more exhaustively (maxFanOut seems to be giving depth)
+/* std::unordered_map<Lit, std::size_t> Aig::compute_fanout_counts() const {
+  std::unordered_map<Lit, std::size_t> node_to_fanout_count_map;
+  node_to_fanout_count_map.reserve(nodes_.size());
 
-// 2) verify order of AND gates to that every fanIn before it has lower id
-for (size_t i = 0; i < nodes_.size(); i++) {
-  // take direct reference to avoid taking copy of nodes
-  const auto &n = nodes_[i];
-  if (n.type != Type::AND)
-    continue; // skip output and input nodes
+  // lambda function
+  auto increment_parent = [&](Lit lit) {
+    // disregard constant literals
+    if (lit == 0 || lit == 1) return; 
+    node_to_fanout_count_map[get_canonical_lit(lit)]++;
+  };
 
-  // explore children of each And node
-  for (Lit fanin : {n.fanin0, n.fanin1}) {
-    // skip fist two literals as there are no dependencies
-    if (fanin == 0 || fanin == 1)
-      continue;
-    int node_index = get_variable_index(fanin);
-
-    auto position_iterator = literal_to_position.find(node_index);
-    if (position_iterator->second >= i) {
-      return false; // child node has greater position than parent node so not
-                    // topologically sorted
+  // loop through all the inner nodes and increment 
+  for (const auto &n : nodes_) {
+    // stored in order from top to bottom
+    if (n.type == Type::AND) { 
+      increment_parent(n.fanin0); 
+      increment_parent(n.fanin1);
     }
   }
-}
-return true;
-}
-*/
+  for (Lit out : outputs_) {
+    increment_parent(out);
+  }
+
+  return node_to_fanout_count_map;
+} */
+
+/* std::size_t Aig::get_max_fanout(const std::unordered_map<Lit, std::size_t>& m) const {
+  std::size_t maxFanOut = 0;
+  for (const auto &it : m) {
+    maxFanOut = std::max(maxFanOut, it.second);
+  }
+  return maxFanOut;
+} */
