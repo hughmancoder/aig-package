@@ -4,7 +4,8 @@ Hugh Signoriello
 
 ## AIG (And-Inverter Graph)
 
-A simple And-Inverter Graph library in C++ for representing and manipulating Boolean functions
+A simple And-Inverter Graph library in C++ for representing and manipulating Boolean functions used in logical synthesis and physical design to help optimise gate-level netlists in digital design. 
+This project was built for the Master's Degree course Logical Synthesis and Physical Design at the Technical University of Munich (TUM). 
 
 ## Features
 
